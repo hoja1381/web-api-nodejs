@@ -1,17 +1,21 @@
 const product = require("../models/product");
 const user = require("../models/user");
 
-const updateProductWhenAddConsume = async (consume) => {
+const updateProductWhenAddConsume = async (consume, updatedProduct) => {
   if (user.findById(consume.userid) != null) {
     consume.productsUsed.forEach(async (element) => {
       const productid = element.productid;
       const foundproduct = await product.findById(productid);
 
       if (foundproduct) {
-        const newQTY = foundproduct.QTY - element.amount;
-        await foundproduct.updateOne({ QTY: newQTY });
+        let newQTY;
+        if (element.purchase) {
+          newQTY = +foundproduct.QTY + +element.amount;
+        } else {
+          newQTY = +foundproduct.QTY - +element.amount;
+        }
 
-        return true;
+        await foundproduct.updateOne({ QTY: newQTY });
       } else {
         //throw Error("not valid product ID");
         console.log("not valid product ID for PUT/consume/");
@@ -23,15 +27,20 @@ const updateProductWhenAddConsume = async (consume) => {
     console.log("not valid User ID PUT/consume/");
     return false;
   }
+  return true;
 };
 
 const updateProductWhenDeleteUse = async (consume) => {
   const productUsed = consume.productsUsed;
 
   productUsed.forEach(async (element) => {
+    let newQTY;
     const foundProduct = await product.findById(element.productid);
-    const newQTY = foundProduct.QTY + element.amount;
-
+    if (element.purchase) {
+      newQTY = +foundProduct.QTY - +element.amount;
+    } else {
+      newQTY = +foundProduct.QTY + +element.amount;
+    }
     await foundProduct.updateOne({ QTY: newQTY });
   });
 };

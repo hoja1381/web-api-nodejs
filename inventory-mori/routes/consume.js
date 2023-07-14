@@ -13,7 +13,7 @@ router.post("/use", async (req, res) => {
       const savedConsume = await newConsume.save();
       res.status(200).json(savedConsume);
     } else {
-      res.status(500).json("not Valid IDs for PUT/consume/");
+      res.status(500).json("not Valid IDs for PUT/consume/ 3 ");
     }
   } catch (err) {
     res.status(500).json(err);
@@ -23,13 +23,14 @@ router.post("/use", async (req, res) => {
 
 router.put("/updateUse/:id", async (req, res) => {
   try {
+    const deletedConsume = await consume.findById(req.params.id);
+    await updateProductWhenDeleteUse(deletedConsume);
+
     const updatedConsume = await consume.findByIdAndUpdate(
       { _id: req.params.id },
       { $set: req.body },
       { new: true }
     );
-
-    await updateProductWhenDeleteUse(updatedConsume);
     await updateProductWhenAddConsume(updatedConsume);
 
     res.status(200).json(updatedConsume);
