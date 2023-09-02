@@ -11,8 +11,7 @@ const consumptionSchema = new mongoose.Schema(
         purchase: { type: Boolean, default: false },
       },
     ],
-    adminId: { type: ObjectId, requiered: true },
-    adminUserName: { type: String },
+    adminId: { type: ObjectId, required: true },
   },
   { timestamps: true }
 );
